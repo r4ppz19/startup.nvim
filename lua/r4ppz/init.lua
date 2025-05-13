@@ -1,5 +1,3 @@
--- local minintro_opened = false
-
 -- Define individual character art
 local R = {
     "█████╗ ",
