@@ -6,7 +6,7 @@ I liked it and forked it to change the logo to my user name lol
 
 ## Screenshot
 
-![r4ppz-screenshot](screenshots/screenshot_2025-05-13_14-12-55.png)
+![r4ppz-screenshot](screenshots/screenshot_2025-05-13_14-25-48.png)
 
 ## Installation
 
