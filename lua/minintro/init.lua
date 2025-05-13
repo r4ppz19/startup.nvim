@@ -1,15 +1,56 @@
 -- local minintro_opened = false
 
-local intro_logo = {
-	" ███╗   ██╗ ███████╗ ██████╗  ██╗   ██╗ ██╗ ███╗   ███╗",
-	" ████╗  ██║ ██╔════╝██╔═══██╗ ██║   ██║ ██║ ████╗ ████║",
-	" ██╔██╗ ██║ █████╗  ██║   ██║ ██║   ██║ ██║ ██╔████╔██║",
-	" ██║╚██╗██║ ██╔══╝  ██║   ██║ ╚██╗ ██╔╝ ██║ ██║╚██╔╝██║",
-	" ██║ ╚████║ ███████╗╚██████╔╝  ╚████╔╝  ██║ ██║ ╚═╝ ██║",
-	" ╚═╝  ╚═══╝ ╚══════╝ ╚═════╝    ╚═══╝   ╚═╝ ╚═╝     ╚═╝"
+-- Define individual character art
+local R = {
+    "█████╗ ",
+    "██╔ ██╗",
+    "█████╔╝",
+    "██╔ ██╗",
+    "██║ ╚██╗",
+    "╚═╝  ╚═╝"
 }
 
-local PLUGIN_NAME = "minintro"
+local F4 = { -- For "Four"
+    "  ██╗  ",
+    " ████╗ ",
+    "██╔ ██║",
+    "███████║",
+    "   ██║ ",
+    "   ╚═╝  "
+}
+
+local P = {
+    "█████╗ ",
+    "██╔ ██╗",
+    "█████╔╝",
+    "██╔══╝ ",
+    "██║    ",
+    "╚═╝    "
+}
+
+local Z = {
+    "███████╗",
+    "╚════██║", -- Using the more robust 'ogre' Z line
+    "   ██╔╝ ",
+    "  ██╔╝  ",
+    " ███████╗",
+    " ╚══════╝"
+}
+
+-- Define the spacer between characters
+local spacer = " "
+
+-- Construct the intro_logo for "R4PPZ"
+local intro_logo = {
+    R[1] .. spacer .. F4[1] .. spacer .. P[1] .. spacer .. P[1] .. spacer .. Z[1],
+    R[2] .. spacer .. F4[2] .. spacer .. P[2] .. spacer .. P[2] .. spacer .. Z[2],
+    R[3] .. spacer .. F4[3] .. spacer .. P[3] .. spacer .. P[3] .. spacer .. Z[3],
+    R[4] .. spacer .. F4[4] .. spacer .. P[4] .. spacer .. P[4] .. spacer .. Z[4],
+    R[5] .. spacer .. F4[5] .. spacer .. P[5] .. spacer .. P[5] .. spacer .. Z[5],
+    R[6] .. spacer .. F4[6] .. spacer .. P[6] .. spacer .. P[6] .. spacer .. Z[6]
+}
+
+local PLUGIN_NAME = "r4ppz"
 local DEFAULT_COLOR = "#98c379"
 local INTRO_LOGO_HEIGHT = #intro_logo
 local INTRO_LOGO_WIDTH = 55
