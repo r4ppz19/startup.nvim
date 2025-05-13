@@ -107,8 +107,13 @@ local function create_and_set_r4ppz_buf(default_buff)
     vim.api.nvim_set_option_value("filetype", "r4ppz", { buf = r4ppz_buff })
     vim.api.nvim_set_option_value("swapfile", false, { buf = r4ppz_buff })
 
-    vim.api.nvim_set_current_buf(r4ppz_buff)
-    vim.api.nvim_buf_delete(default_buff, { force = true })
+    -- Check if the default buffer is valid before trying to delete it
+    if vim.api.nvim_buf_is_valid(default_buff) then
+        vim.api.nvim_set_current_buf(r4ppz_buff)
+        vim.api.nvim_buf_delete(default_buff, { force = true })
+    else
+        vim.api.nvim_set_current_buf(r4ppz_buff)
+    end
 
     return r4ppz_buff
 end
