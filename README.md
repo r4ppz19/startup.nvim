@@ -1,6 +1,4 @@
-# r4ppz.nvim (Forked)
-
-This repository is a fork of [minintro.nvim](https://github.com/eoh-bse/minintro.nvim).
+# r4ppz.nvim
 
 I liked it and forked it to change the logo to my user name lol
 
@@ -43,4 +41,4 @@ require("r4ppz").setup({
 
 ## Credits
 
-This plugin is a fork of [minintro.nvim](https://github.com/eoh-bse/minintro.nvim) by [eoh-bse](https://github.com/eoh-bse).
+This plugin is a fork of [minintro.nvim](https://github.com/eoh-bse/minintro.nvim)
