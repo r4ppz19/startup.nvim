@@ -1,38 +1,38 @@
 -- Define individual character art
 local R = {
-    "██████╗ ",
-    "██╔══██╗",
-    "██████╔╝",
-    "██╔══██╗",
-    "██║  ██║",
-    "╚═╝  ╚═╝"
+	"██████╗ ",
+	"██╔══██╗",
+	"██████╔╝",
+	"██╔══██╗",
+	"██║  ██║",
+	"╚═╝  ╚═╝",
 }
 
 local F4 = {
-    "██╗  ██╗",
-    "██║  ██║",
-    "███████║",
-    "╚════██║",
-    "     ██║",
-    "     ╚═╝"
+	"██╗  ██╗",
+	"██║  ██║",
+	"███████║",
+	"╚════██║",
+	"     ██║",
+	"     ╚═╝",
 }
 
 local P = {
-    "██████╗ ",
-    "██╔══██╗",
-    "██████╔╝",
-    "██╔═══╝ ",
-    "██║     ",
-    "╚═╝     "
+	"██████╗ ",
+	"██╔══██╗",
+	"██████╔╝",
+	"██╔═══╝ ",
+	"██║     ",
+	"╚═╝     ",
 }
 
 local Z = {
-    "███████╗",
-    "╚══███╔╝",
-    "  ███╔╝ ",
-    " ███╔╝  ",
-    "███████╗",
-    "╚══════╝"
+	"███████╗",
+	"╚══███╔╝",
+	"  ███╔╝ ",
+	" ███╔╝  ",
+	"███████╗",
+	"╚══════╝",
 }
 
 -- Define the spacer between characters
@@ -40,138 +40,149 @@ local spacer = " "
 
 -- Construct the intro_logo for "R4PPZ"
 local intro_logo = {
-    R[1] .. spacer .. F4[1] .. spacer .. P[1] .. spacer .. P[1] .. spacer .. Z[1],
-    R[2] .. spacer .. F4[2] .. spacer .. P[2] .. spacer .. P[2] .. spacer .. Z[2],
-    R[3] .. spacer .. F4[3] .. spacer .. P[3] .. spacer .. P[3] .. spacer .. Z[3],
-    R[4] .. spacer .. F4[4] .. spacer .. P[4] .. spacer .. P[4] .. spacer .. Z[4],
-    R[5] .. spacer .. F4[5] .. spacer .. P[5] .. spacer .. P[5] .. spacer .. Z[5],
-    R[6] .. spacer .. F4[6] .. spacer .. P[6] .. spacer .. P[6] .. spacer .. Z[6]
+	R[1] .. spacer .. F4[1] .. spacer .. P[1] .. spacer .. P[1] .. spacer .. Z[1],
+	R[2] .. spacer .. F4[2] .. spacer .. P[2] .. spacer .. P[2] .. spacer .. Z[2],
+	R[3] .. spacer .. F4[3] .. spacer .. P[3] .. spacer .. P[3] .. spacer .. Z[3],
+	R[4] .. spacer .. F4[4] .. spacer .. P[4] .. spacer .. P[4] .. spacer .. Z[4],
+	R[5] .. spacer .. F4[5] .. spacer .. P[5] .. spacer .. P[5] .. spacer .. Z[5],
+	R[6] .. spacer .. F4[6] .. spacer .. P[6] .. spacer .. P[6] .. spacer .. Z[6],
 }
 
 local PLUGIN_NAME = "r4ppz"
 local DEFAULT_COLOR = "#98c379"
 local INTRO_LOGO_HEIGHT = #intro_logo
-local INTRO_LOGO_WIDTH = 55
+local INTRO_LOGO_WIDTH = vim.fn.strdisplaywidth(intro_logo[1])
 
 local autocmd_group = vim.api.nvim_create_augroup(PLUGIN_NAME, {})
 local highlight_ns_id = vim.api.nvim_create_namespace(PLUGIN_NAME)
 local r4ppz_buff = -1
 
 local function unlock_buf(buf)
-    vim.api.nvim_set_option_value("modifiable", true, { buf = buf })
+	vim.api.nvim_set_option_value("modifiable", true, { buf = buf })
 end
 
 local function lock_buf(buf)
-    vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
+	vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
 end
 
 local function draw_r4ppz(buf, logo_width, logo_height)
-    local window = vim.fn.bufwinid(buf)
-    local screen_width = vim.api.nvim_win_get_width(window)
-    local screen_height = vim.api.nvim_win_get_height(window) - vim.opt.cmdheight:get()
+	local window = vim.fn.bufwinid(buf)
+	local screen_width = vim.api.nvim_win_get_width(window)
+	local screen_height = vim.api.nvim_win_get_height(window) - vim.opt.cmdheight:get()
 
-    local start_col = math.floor((screen_width - logo_width) / 2)
-    local start_row = math.floor((screen_height - logo_height) / 2)
-    if (start_col < 0 or start_row < 0) then return end
+	local start_col = math.floor((screen_width - logo_width) / 2)
+	local start_row = math.floor((screen_height - logo_height) / 2)
+	if start_col < 0 or start_row < 0 then
+		return
+	end
 
-    local top_space = {}
-    for _ = 1, start_row do table.insert(top_space, "") end
+	local top_space = {}
+	for _ = 1, start_row do
+		table.insert(top_space, "")
+	end
 
-    local col_offset_spaces = {}
-    for _ = 1, start_col do table.insert(col_offset_spaces, " ") end
-    local col_offset = table.concat(col_offset_spaces, '')
+	local col_offset_spaces = {}
+	for _ = 1, start_col do
+		table.insert(col_offset_spaces, " ")
+	end
+	local col_offset = table.concat(col_offset_spaces, "")
 
-    local adjusted_logo = {}
-    for _, line in ipairs(intro_logo) do
-        table.insert(adjusted_logo, col_offset .. line)
-    end
+	local adjusted_logo = {}
+	for _, line in ipairs(intro_logo) do
+		table.insert(adjusted_logo, col_offset .. line)
+	end
 
-    unlock_buf(buf)
-    vim.api.nvim_buf_set_lines(buf, 1, 1, true, top_space)
-    vim.api.nvim_buf_set_lines(buf, start_row, start_row, true, adjusted_logo)
-    lock_buf(buf)
+	unlock_buf(buf)
+	vim.api.nvim_buf_set_lines(buf, 1, 1, true, top_space)
+	vim.api.nvim_buf_set_lines(buf, start_row, start_row, true, adjusted_logo)
+	lock_buf(buf)
 
-    vim.api.nvim_buf_set_extmark(buf, highlight_ns_id, start_row, start_col, {
-        end_row = start_row + INTRO_LOGO_HEIGHT,
-        hl_group = "Default"
-    })
+	vim.api.nvim_buf_set_extmark(buf, highlight_ns_id, start_row, start_col, {
+		end_row = start_row + INTRO_LOGO_HEIGHT,
+		hl_group = "Default",
+	})
 end
 
 local function create_and_set_r4ppz_buf(default_buff)
-    local r4ppz_buff = vim.api.nvim_create_buf("nobuflisted", "unlisted")
-    vim.api.nvim_buf_set_name(r4ppz_buff, PLUGIN_NAME)
-    vim.api.nvim_set_option_value("bufhidden", "wipe", { buf = r4ppz_buff })
-    vim.api.nvim_set_option_value("buftype", "nofile", { buf = r4ppz_buff })
-    vim.api.nvim_set_option_value("filetype", "r4ppz", { buf = r4ppz_buff })
-    vim.api.nvim_set_option_value("swapfile", false, { buf = r4ppz_buff })
+	local r4ppz_buff = vim.api.nvim_create_buf("nobuflisted", "unlisted")
+	vim.api.nvim_buf_set_name(r4ppz_buff, PLUGIN_NAME)
+	vim.api.nvim_set_option_value("bufhidden", "wipe", { buf = r4ppz_buff })
+	vim.api.nvim_set_option_value("buftype", "nofile", { buf = r4ppz_buff })
+	vim.api.nvim_set_option_value("filetype", "r4ppz", { buf = r4ppz_buff })
+	vim.api.nvim_set_option_value("swapfile", false, { buf = r4ppz_buff })
 
-    -- Set the new r4ppz_buff as the current buffer.
-    vim.api.nvim_set_current_buf(r4ppz_buff)
+	-- Set the new r4ppz_buff as the current buffer.
+	vim.api.nvim_set_current_buf(r4ppz_buff)
 
-    -- Now, attempt to delete the original default_buff.
-    -- It's no longer the current buffer. Check its validity again, as switching
-    -- might have caused it to be wiped (e.g., due to bufhidden=wipe or other autocommands).
-    if vim.api.nvim_buf_is_valid(default_buff) then
-        -- As a safeguard, ensure we are not trying to delete the buffer we just made current.
-        -- This should not happen if default_buff and r4ppz_buff are distinct.
-        if default_buff ~= r4ppz_buff then
-            vim.api.nvim_buf_delete(default_buff, { force = true })
-        end
-    end
+	-- Now, attempt to delete the original default_buff.
+	-- It's no longer the current buffer. Check its validity again, as switching
+	-- might have caused it to be wiped (e.g., due to bufhidden=wipe or other autocommands).
+	if vim.api.nvim_buf_is_valid(default_buff) then
+		-- As a safeguard, ensure we are not trying to delete the buffer we just made current.
+		-- This should not happen if default_buff and r4ppz_buff are distinct.
+		if default_buff ~= r4ppz_buff then
+			vim.api.nvim_buf_delete(default_buff, { force = true })
+		end
+	end
 
-    return r4ppz_buff
+	return r4ppz_buff
 end
 
 local function set_options()
-    vim.opt_local.number = false         -- disable line numbers
-    vim.opt_local.relativenumber = false -- disable relative line numbers
-    vim.opt_local.list = false           -- disable displaying whitespace
-    vim.opt_local.fillchars = { eob = ' ' } -- do not display "~" on each new line
-    vim.opt_local.colorcolumn = "0"      -- disable colorcolumn
+	vim.opt_local.number = false -- disable line numbers
+	vim.opt_local.relativenumber = false -- disable relative line numbers
+	vim.opt_local.list = false -- disable displaying whitespace
+	vim.opt_local.fillchars = { eob = " " } -- do not display "~" on each new line
+	vim.opt_local.colorcolumn = "0" -- disable colorcolumn
 end
 
 local function redraw()
-    unlock_buf(r4ppz_buff)
-    vim.api.nvim_buf_set_lines(r4ppz_buff, 0, -1, true, {})
-    lock_buf(r4ppz_buff)
-    draw_r4ppz(r4ppz_buff, INTRO_LOGO_WIDTH, INTRO_LOGO_HEIGHT)
+	unlock_buf(r4ppz_buff)
+	vim.api.nvim_buf_set_lines(r4ppz_buff, 0, -1, true, {})
+	lock_buf(r4ppz_buff)
+	draw_r4ppz(r4ppz_buff, INTRO_LOGO_WIDTH, INTRO_LOGO_HEIGHT)
 end
 
 local function display_r4ppz(payload)
-    local is_dir = vim.fn.isdirectory(payload.file) == 1
+	local is_dir = vim.fn.isdirectory(payload.file) == 1
 
-    local default_buff = vim.api.nvim_get_current_buf()
-    local default_buff_name = vim.api.nvim_buf_get_name(default_buff)
-    local default_buff_filetype = vim.api.nvim_get_option_value("filetype", { buf = default_buff })
-    -- Also check against PLUGIN_NAME in case it was already set somehow
-    if not is_dir and default_buff_name ~= "" and default_buff_filetype ~= PLUGIN_NAME and default_buff_filetype ~= "r4ppz" then
-        return
-    end
+	local default_buff = vim.api.nvim_get_current_buf()
+	local default_buff_name = vim.api.nvim_buf_get_name(default_buff)
+	local default_buff_filetype = vim.api.nvim_get_option_value("filetype", { buf = default_buff })
+	-- Also check against PLUGIN_NAME in case it was already set somehow
+	if
+		not is_dir
+		and default_buff_name ~= ""
+		and default_buff_filetype ~= PLUGIN_NAME
+		and default_buff_filetype ~= "r4ppz"
+	then
+		return
+	end
 
-    r4ppz_buff = create_and_set_r4ppz_buf(default_buff)
-    set_options()
+	r4ppz_buff = create_and_set_r4ppz_buf(default_buff)
+	set_options()
 
-    draw_r4ppz(r4ppz_buff, INTRO_LOGO_WIDTH, INTRO_LOGO_HEIGHT)
+	draw_r4ppz(r4ppz_buff, INTRO_LOGO_WIDTH, INTRO_LOGO_HEIGHT)
 
-    vim.api.nvim_create_autocmd({ "WinResized", "VimResized" }, {
-        group = autocmd_group,
-        buffer = r4ppz_buff,
-        callback = redraw
-    })
+	vim.api.nvim_create_autocmd({ "WinResized", "VimResized" }, {
+		group = autocmd_group,
+		buffer = r4ppz_buff,
+		callback = redraw,
+	})
 end
 
 local function setup(options)
-    options = options or {}
-    vim.api.nvim_set_hl(highlight_ns_id, "Default", { fg = options.color or DEFAULT_COLOR })
-    vim.api.nvim_set_hl_ns(highlight_ns_id)
+	options = options or {}
+	vim.api.nvim_set_hl(highlight_ns_id, "Default", { fg = options.color or DEFAULT_COLOR })
+	vim.api.nvim_set_hl_ns(highlight_ns_id)
 
-    vim.api.nvim_create_autocmd("VimEnter", {
-        group = autocmd_group,
-        callback = display_r4ppz,
-        once = true
-    })
+	vim.api.nvim_create_autocmd("VimEnter", {
+		group = autocmd_group,
+		callback = display_r4ppz,
+		once = true,
+	})
 end
 
 return {
-    setup = setup
+	setup = setup,
 }
