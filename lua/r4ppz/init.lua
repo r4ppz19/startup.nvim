@@ -51,6 +51,7 @@ local intro_logo = {
 local PLUGIN_NAME = "r4ppz"
 local DEFAULT_COLOR = "#98c379"
 local INTRO_LOGO_HEIGHT = #intro_logo
+-- Calculate the exact width by measuring the first line of the logo
 local INTRO_LOGO_WIDTH = vim.fn.strdisplaywidth(intro_logo[1])
 
 local autocmd_group = vim.api.nvim_create_augroup(PLUGIN_NAME, {})
@@ -70,6 +71,7 @@ local function draw_r4ppz(buf, logo_width, logo_height)
 	local screen_width = vim.api.nvim_win_get_width(window)
 	local screen_height = vim.api.nvim_win_get_height(window) - vim.opt.cmdheight:get()
 
+	-- Ensure precise centering by making the calculation more accurate
 	local start_col = math.max(0, math.floor((screen_width - logo_width) / 2))
 	local start_row = math.max(0, math.floor((screen_height - logo_height) / 2))
 
@@ -85,25 +87,24 @@ local function draw_r4ppz(buf, logo_width, logo_height)
 
 	vim.api.nvim_buf_set_lines(buf, 0, 0, true, top_space)
 
-	-- Create spaces for horizontal centering
-	local col_offset_spaces = {}
-	for _ = 1, start_col do
-		table.insert(col_offset_spaces, " ")
-	end
-	local col_offset = table.concat(col_offset_spaces, "")
+	-- Create spaces for horizontal centering - use string.rep for more accurate spacing
+	local col_offset = string.rep(" ", start_col)
 
 	-- Add all lines at once
 	local adjusted_logo = {}
 	for _, line in ipairs(intro_logo) do
 		table.insert(adjusted_logo, col_offset .. line)
 	end
+
+	-- Insert the logo at the calculated position
 	vim.api.nvim_buf_set_lines(buf, start_row, start_row, true, adjusted_logo)
 
 	lock_buf(buf)
 
-	-- Apply highlight using the correct dimensions
-	vim.api.nvim_buf_set_extmark(buf, highlight_ns_id, start_row, start_col, {
+	-- Apply highlight to the entire logo area
+	vim.api.nvim_buf_set_extmark(buf, highlight_ns_id, start_row, 0, {
 		end_row = start_row + INTRO_LOGO_HEIGHT,
+		end_col = screen_width,
 		hl_group = "Default",
 	})
 end
