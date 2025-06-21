@@ -65,38 +65,56 @@ local function lock_buf(buf)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
 end
 
-local function draw_r4ppz(buf, logo_width, logo_height)
+local function draw_r4ppz(buf, logo_width, logo_height, options)
+	options = options or {}
+	local animate = options.animate or false
+
 	local window = vim.fn.bufwinid(buf)
 	local screen_width = vim.api.nvim_win_get_width(window)
 	local screen_height = vim.api.nvim_win_get_height(window) - vim.opt.cmdheight:get()
 
-	local start_col = math.floor((screen_width - logo_width) / 2)
-	local start_row = math.floor((screen_height - logo_height) / 2)
-	if start_col < 0 or start_row < 0 then
-		return
-	end
+	local start_col = math.max(0, math.floor((screen_width - logo_width) / 2))
+	local start_row = math.max(0, math.floor((screen_height - logo_height) / 2))
 
+	-- Clear buffer first
+	unlock_buf(buf)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, true, {})
+
+	-- Create empty lines for vertical centering
 	local top_space = {}
 	for _ = 1, start_row do
 		table.insert(top_space, "")
 	end
 
+	vim.api.nvim_buf_set_lines(buf, 0, 0, true, top_space)
+
+	-- Create spaces for horizontal centering
 	local col_offset_spaces = {}
 	for _ = 1, start_col do
 		table.insert(col_offset_spaces, " ")
 	end
 	local col_offset = table.concat(col_offset_spaces, "")
 
-	local adjusted_logo = {}
-	for _, line in ipairs(intro_logo) do
-		table.insert(adjusted_logo, col_offset .. line)
+	if animate then
+		-- Animate each line of the logo
+		for i, line in ipairs(intro_logo) do
+			local adjusted_line = col_offset .. line
+			vim.api.nvim_buf_set_lines(buf, start_row + i - 1, start_row + i - 1, true, { adjusted_line })
+			vim.cmd("redraw")
+			vim.loop.sleep(50) -- 50ms delay between lines
+		end
+	else
+		-- Add all lines at once
+		local adjusted_logo = {}
+		for _, line in ipairs(intro_logo) do
+			table.insert(adjusted_logo, col_offset .. line)
+		end
+		vim.api.nvim_buf_set_lines(buf, start_row, start_row, true, adjusted_logo)
 	end
 
-	unlock_buf(buf)
-	vim.api.nvim_buf_set_lines(buf, 1, 1, true, top_space)
-	vim.api.nvim_buf_set_lines(buf, start_row, start_row, true, adjusted_logo)
 	lock_buf(buf)
 
+	-- Apply highlight using the correct dimensions
 	vim.api.nvim_buf_set_extmark(buf, highlight_ns_id, start_row, start_col, {
 		end_row = start_row + INTRO_LOGO_HEIGHT,
 		hl_group = "Default",
@@ -171,14 +189,57 @@ local function display_r4ppz(payload)
 	})
 end
 
+-- Setup keybindings for the splash screen
+local function setup_keymaps()
+	local function close_splash()
+		if vim.api.nvim_buf_is_valid(r4ppz_buff) then
+			vim.api.nvim_buf_delete(r4ppz_buff, { force = true })
+		end
+	end
+
+	-- Map 'q', 'Esc', and 'Enter' to close the splash screen
+	vim.api.nvim_buf_set_keymap(r4ppz_buff, "n", "q", "", { callback = close_splash, noremap = true, silent = true })
+	vim.api.nvim_buf_set_keymap(
+		r4ppz_buff,
+		"n",
+		"<Esc>",
+		"",
+		{ callback = close_splash, noremap = true, silent = true }
+	)
+	vim.api.nvim_buf_set_keymap(r4ppz_buff, "n", "<CR>", "", { callback = close_splash, noremap = true, silent = true })
+end
+
 local function setup(options)
 	options = options or {}
-	vim.api.nvim_set_hl(highlight_ns_id, "Default", { fg = options.color or DEFAULT_COLOR })
+	local animate = options.animate ~= nil and options.animate or true
+
+	-- Set up highlight color
+	local fg_color = options.color or DEFAULT_COLOR
+	local bg_color = options.background or "NONE"
+
+	vim.api.nvim_set_hl(highlight_ns_id, "Default", {
+		fg = fg_color,
+		bg = bg_color,
+		bold = options.bold ~= nil and options.bold or false,
+	})
 	vim.api.nvim_set_hl_ns(highlight_ns_id)
 
 	vim.api.nvim_create_autocmd("VimEnter", {
 		group = autocmd_group,
-		callback = display_r4ppz,
+		callback = function(payload)
+			display_r4ppz(payload)
+			setup_keymaps()
+			-- Pass animation option to draw function if explicitly set
+			if animate then
+				redraw = function()
+					unlock_buf(r4ppz_buff)
+					vim.api.nvim_buf_set_lines(r4ppz_buff, 0, -1, true, {})
+					lock_buf(r4ppz_buff)
+					draw_r4ppz(r4ppz_buff, INTRO_LOGO_WIDTH, INTRO_LOGO_HEIGHT, { animate = animate })
+				end
+				draw_r4ppz(r4ppz_buff, INTRO_LOGO_WIDTH, INTRO_LOGO_HEIGHT, { animate = animate })
+			end
+		end,
 		once = true,
 	})
 end
