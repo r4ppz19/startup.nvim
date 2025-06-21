@@ -65,10 +65,7 @@ local function lock_buf(buf)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
 end
 
-local function draw_r4ppz(buf, logo_width, logo_height, options)
-	options = options or {}
-	local animate = options.animate or false
-
+local function draw_r4ppz(buf, logo_width, logo_height)
 	local window = vim.fn.bufwinid(buf)
 	local screen_width = vim.api.nvim_win_get_width(window)
 	local screen_height = vim.api.nvim_win_get_height(window) - vim.opt.cmdheight:get()
@@ -95,22 +92,12 @@ local function draw_r4ppz(buf, logo_width, logo_height, options)
 	end
 	local col_offset = table.concat(col_offset_spaces, "")
 
-	if animate then
-		-- Animate each line of the logo
-		for i, line in ipairs(intro_logo) do
-			local adjusted_line = col_offset .. line
-			vim.api.nvim_buf_set_lines(buf, start_row + i - 1, start_row + i - 1, true, { adjusted_line })
-			vim.cmd("redraw")
-			vim.loop.sleep(50) -- 50ms delay between lines
-		end
-	else
-		-- Add all lines at once
-		local adjusted_logo = {}
-		for _, line in ipairs(intro_logo) do
-			table.insert(adjusted_logo, col_offset .. line)
-		end
-		vim.api.nvim_buf_set_lines(buf, start_row, start_row, true, adjusted_logo)
+	-- Add all lines at once
+	local adjusted_logo = {}
+	for _, line in ipairs(intro_logo) do
+		table.insert(adjusted_logo, col_offset .. line)
 	end
+	vim.api.nvim_buf_set_lines(buf, start_row, start_row, true, adjusted_logo)
 
 	lock_buf(buf)
 
@@ -211,7 +198,6 @@ end
 
 local function setup(options)
 	options = options or {}
-	local animate = options.animate ~= nil and options.animate or true
 
 	-- Set up highlight color
 	local fg_color = options.color or DEFAULT_COLOR
@@ -229,16 +215,6 @@ local function setup(options)
 		callback = function(payload)
 			display_r4ppz(payload)
 			setup_keymaps()
-			-- Pass animation option to draw function if explicitly set
-			if animate then
-				redraw = function()
-					unlock_buf(r4ppz_buff)
-					vim.api.nvim_buf_set_lines(r4ppz_buff, 0, -1, true, {})
-					lock_buf(r4ppz_buff)
-					draw_r4ppz(r4ppz_buff, INTRO_LOGO_WIDTH, INTRO_LOGO_HEIGHT, { animate = animate })
-				end
-				draw_r4ppz(r4ppz_buff, INTRO_LOGO_WIDTH, INTRO_LOGO_HEIGHT, { animate = animate })
-			end
 		end,
 		once = true,
 	})
