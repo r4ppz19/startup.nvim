@@ -1,10 +1,10 @@
-# r4ppz.nvim
+# startup.nvim
 
 I liked it and forked it to change the logo to my user name lol
 
 ## Screenshot
 
-![r4ppz-screenshot](screenshots/screenshot_2025-05-14_17-28-32.png)
+![screenshot](screenshots/screenshot_2025-06-24_11-17-06.png)
 
 ## Installation
 
@@ -12,31 +12,10 @@ I liked it and forked it to change the logo to my user name lol
 
 ```lua
 {
-    "r4ppz/r4ppz.nvim",
-    lazy = false, -- Or true if you prefer, ensure it loads on VimEnter or similar
+    "r4ppz19/startup.nvim",
+    lazy = false,
     opts = { color = "#98c379" } -- Your preferred color
 }
-```
-
-**Packer.nvim**
-
-```lua
-use {
-    "r4ppz/r4ppz.nvim",
-    config = function() 
-        require("r4ppz").setup({ color = "#98c379" }) -- Your preferred color
-    end
-}
-```
-
-## Configuration
-
-The only option is `color` for the logo:
-
-```lua
-require("r4ppz").setup({
-    color = "#YOUR_HEX_COLOR" 
-})
 ```
 
 ## Credits
