@@ -17,7 +17,3 @@ I liked it and forked it to change the logo to my user name lol
     opts = { color = "#98c379" } -- Your preferred color
 }
 ```
-
-## Credits
-
-This plugin is a fork of [minintro.nvim](https://github.com/eoh-bse/minintro.nvim)
