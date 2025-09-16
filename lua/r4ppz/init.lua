@@ -164,15 +164,7 @@ local function display_r4ppz(payload)
 
 	draw_r4ppz(r4ppz_buff, INTRO_LOGO_WIDTH, INTRO_LOGO_HEIGHT)
 
-	vim.api.nvim_create_autocmd({ "WinResized", "VimResized" }, {
-		group = autocmd_group,
-		buffer = r4ppz_buff,
-		callback = redraw,
-	})
-end
-
--- Setup keybindings for the splash screen
-local function setup_keymaps()
+	-- Setup keybindings for the splash screen
 	local function close_splash()
 		if vim.api.nvim_buf_is_valid(r4ppz_buff) then
 			vim.api.nvim_buf_delete(r4ppz_buff, { force = true })
@@ -189,6 +181,12 @@ local function setup_keymaps()
 		{ callback = close_splash, noremap = true, silent = true }
 	)
 	vim.api.nvim_buf_set_keymap(r4ppz_buff, "n", "<CR>", "", { callback = close_splash, noremap = true, silent = true })
+
+	vim.api.nvim_create_autocmd({ "WinResized", "VimResized" }, {
+		group = autocmd_group,
+		buffer = r4ppz_buff,
+		callback = redraw,
+	})
 end
 
 local function setup(options)
@@ -209,7 +207,6 @@ local function setup(options)
 		group = autocmd_group,
 		callback = function(payload)
 			display_r4ppz(payload)
-			setup_keymaps()
 		end,
 		once = true,
 	})
